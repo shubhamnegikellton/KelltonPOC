@@ -1,7 +1,7 @@
 import streamlit as st
 
 from navigation import make_sidebar
-from singtel.db.db_connection import connect_to_db, execute_query
+from singtel.db.db_connection import connect_to_db, execute_query, drop_all_data
 from utilities import use_header
 
 # show header
@@ -17,6 +17,15 @@ df = execute_query(connection, select_query)
 
 if df is not None and not df.empty:
     st.write("### SingTel Data")
+    if st.button("Delete Data", type="primary"):
+        error_placeholder = st.empty()
+        with st.spinner(text="Deletion in progress..."):
+            # response = drop_all_data(connection, "singtel_data")
+            response = f"Error: drop_all_data(connection, singtel_data)"
+            if response.startswith("Error"):
+                error_placeholder.empty()
+                error_placeholder.markdown(f"<div style='width: 100%; color: red;text-align:left;margin-botto'>{response}</div>", unsafe_allow_html=True)
+
     rows_per_page = 10
     total_rows = len(df)
     total_pages = (total_rows - 1) // rows_per_page + 1

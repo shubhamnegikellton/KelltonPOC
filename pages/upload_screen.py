@@ -147,6 +147,7 @@ elif st.session_state.current_step == 2:
         df = st.data_editor(df, num_rows="dynamic")
 
         col1, col2 = st.columns([9,1])
+        error_placeholder = st.empty()
         with col1:
             if st.button("Back"):
                 st.session_state.current_step = 1
@@ -168,7 +169,8 @@ elif st.session_state.current_step == 2:
                     data_tuples = df_rearranged.to_records(index=False).tolist()
                     response = insert_data(connection, data_tuples)
                     if response.startswith("Error"):
-                        st.error(response)
+                        error_placeholder.empty()
+                        error_placeholder.markdown(f"<div style='width: 100%; color: red;text-align:center;'>{response}</div>", unsafe_allow_html=True)
                     else:
                         st.session_state.current_step = 3
                         st.rerun()

@@ -24,6 +24,7 @@ if df is not None and not df.empty:
             if response.startswith("Error"):
                 error_placeholder.empty()
                 error_placeholder.markdown(f"<div style='width: 100%; color: red;text-align:left;'>{response}</div>", unsafe_allow_html=True)
+            st.rerun()
 
     rows_per_page = 10
     total_rows = len(df)

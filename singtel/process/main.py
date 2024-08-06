@@ -21,11 +21,26 @@ from .utility import (
     update_city_value,
     update_country_value,
     update_row,
-    update_unit_cost
+    update_unit_cost,
+    get_images_from_uploaded_file,
+    extract_text_from_image
 )
+from io import BytesIO
+from PIL import Image as PILImage
 
 
 def process_format_a(uploaded_file):
+    images = get_images_from_uploaded_file(uploaded_file)
+    image_text = []
+
+    # code to get the name from image
+    for i, img in enumerate(images):
+        img_byte_arr = BytesIO()
+        img.save(img_byte_arr, format='PNG')
+        pil_image = PILImage.open(BytesIO(img_byte_arr.getvalue()))
+        text = extract_text_from_image(pil_image)
+        image_text.append(text)
+    
     df = pd.read_excel(uploaded_file, sheet_name=0)
     df = df.fillna("")
 
@@ -62,10 +77,10 @@ def process_format_a(uploaded_file):
     ]
 
     mapped_dict = get_mapping(
-        header, desired_columns, df.iloc[header_index + 2].to_string(index=False)
+        header, desired_columns, df.iloc[header_index + 2].to_string(index=False),
     )
     mapped_dict = convert_str_to_dict(mapped_dict)
-    rest_data = get_rest_data_map(rest_data_df.to_csv(), desired_columns)
+    rest_data = get_rest_data_map(rest_data_df.to_csv(), desired_columns, image_text)
     rest_data = convert_str_to_dict(rest_data)
 
     # Step 5: Generate the destination table data

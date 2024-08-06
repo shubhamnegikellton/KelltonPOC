@@ -18,7 +18,7 @@ def qa_chatbot_response(message, stream_callback=None):
     db = SQLDatabase.from_uri(os.environ["DB_URL"])
 
     # LLM configuration with streaming enabled
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, stream=True)
+    llm = ChatOpenAI(model="gpt-4o", temperature=0, stream=True)
 
     # query prompt update with values
     prompt = ChatPromptTemplate.from_messages([("system", prompt_template)]).partial(

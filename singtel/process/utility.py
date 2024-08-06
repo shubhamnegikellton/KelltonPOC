@@ -6,13 +6,14 @@ import os
 import re
 from io import StringIO
 
-import openpyxl
 import pandas as pd
 import requests
-import xlrd
 from openai import OpenAI
-from PIL import Image
+from openpyxl import load_workbook
+from openpyxl_image_loader import SheetImageLoader
+import easyocr
 from io import BytesIO
+import numpy as np
 
 # Configure the logging
 logging.basicConfig(level=logging.INFO)
@@ -95,7 +96,7 @@ def get_mapping(header, desired_columns, row_data):
     return response
 
 
-def get_rest_data_map(rest_data_df, desired_columns):
+def get_rest_data_map(rest_data_df, desired_columns, suppliers):
     output = {
         "Desired ColumnA": "value 1",
         "Desired ColumnB": "value 2",
@@ -104,10 +105,13 @@ def get_rest_data_map(rest_data_df, desired_columns):
     prompt = f"""
     desired columns: {desired_columns}
     raw_data: {rest_data_df}
+    suppliers: {suppliers}
 
     Provide the dictionary with mappings where desired column is associated with its raw data. If a desired column cannot be mapped, ensure it remains empty.
     Here, we can only map these desired columns: Date, Country, City, Supplier, Quote #, Currency.
+    Please check suppliers if any supplier name found in it and map with Supplier otherwise check throughly for Supplier.
     Also, Supplier should not be SingTel or Singapore telecommunication or SINGAPORE TELECOM HONG KONG LIMITED and Dataformat should be like "14-Nov-2024"
+    Do not update country or city from company adress or company name.
     
     Currency should be in ISO 4217 format (e.g., USD, EUR).
     Example Output: {output}
@@ -448,3 +452,42 @@ def parse_final_answer(output: str) -> str:
 def log_output(output: str) -> str:
     logger.info(f"Output Results: {output}")
     return output
+
+
+def get_images_from_uploaded_file(uploaded_file):
+    try:
+        images = []
+        file_contents = uploaded_file.read()
+        file_stream = BytesIO(file_contents)
+        file_name = uploaded_file.name
+        file_extension = file_name.split('.')[-1].lower()
+
+        if file_extension == 'xlsx':
+            wb = load_workbook(file_stream, data_only=True)
+            sheet_names = wb.sheetnames
+
+            if not sheet_names:
+                print("No sheets found in the workbook.")
+                return []
+
+            first_sheet = wb[sheet_names[0]]
+            image_loader = SheetImageLoader(first_sheet)
+
+            for row in first_sheet.iter_rows():
+                for cell in row:
+                    if image_loader.image_in(cell.coordinate):
+                        img = image_loader.get(cell.coordinate)
+                        images.append(img)
+
+        return images
+    except Exception as e:
+        print(f"Error: {e}")
+        return []
+
+
+
+def extract_text_from_image(image):
+    reader = easyocr.Reader(['en'])
+    image_np = np.array(image)
+    result = reader.readtext(image_np, detail=0)
+    return " ".join(result)

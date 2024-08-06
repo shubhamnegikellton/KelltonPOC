@@ -1,0 +1,12 @@
+openai
+pandas
+numpy
+python-dotenv
+streamlit
+openpyxl
+psycopg2-binary
+xlrd
+langchain
+langchain-community
+langchain-openai
+sqlalchemy

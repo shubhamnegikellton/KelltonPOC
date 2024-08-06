@@ -1,17 +1,24 @@
 import os
 
 import psycopg2
+import streamlit as st
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
 
 # Get database connection parameters from environment variables
-dbname = os.getenv("DB_NAME")
-user = os.getenv("DB_USER")
-password = os.getenv("DB_PASSWORD")
-host = os.getenv("DB_HOST")
-port = os.getenv("DB_PORT")
+cred_prefix=""
+if st.secrets['is_local']:
+    cred_prefix = "local_db"
+else:
+    cred_prefix = "server_db"
+
+dbname = st.secrets[cred_prefix]['DB_NAME']
+user = st.secrets[cred_prefix]['DB_USER']
+password = st.secrets[cred_prefix]['DB_PASSWORD']
+host = st.secrets[cred_prefix]['DB_HOST']
+port = st.secrets[cred_prefix]['DB_PORT']
 
 # SQL command to create the table
 create_table_query = """

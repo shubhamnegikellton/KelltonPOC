@@ -80,3 +80,18 @@ def execute_query(connection, query, data=None):
             cursor.close()
 
     return result
+
+def drop_all_data(connection, table_name):
+    drop_query = f"TRUNCATE TABLE {table_name} RESTART IDENTITY CASCADE;"
+    cursor = None
+    try:
+        cursor = connection.cursor()
+        cursor.execute(drop_query)
+        connection.commit()
+        print(f"All data removed successfully from table {table_name}")
+        return f"Success: All data removed successfully from table {table_name}"
+    except (Exception, psycopg2.DatabaseError) as error:
+        return f"Error: {error}"
+    finally:
+        if cursor is not None:
+            cursor.close()

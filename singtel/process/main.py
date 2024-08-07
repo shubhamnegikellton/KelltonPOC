@@ -30,16 +30,16 @@ from PIL import Image as PILImage
 
 
 def process_format_a(uploaded_file):
-    images = get_images_from_uploaded_file(uploaded_file)
+    # images = get_images_from_uploaded_file(uploaded_file)
     image_text = []
 
     # code to get the name from image
-    for i, img in enumerate(images):
-        img_byte_arr = BytesIO()
-        img.save(img_byte_arr, format='PNG')
-        pil_image = PILImage.open(BytesIO(img_byte_arr.getvalue()))
-        text = extract_text_from_image(pil_image)
-        image_text.append(text)
+    # for i, img in enumerate(images):
+    #     img_byte_arr = BytesIO()
+    #     img.save(img_byte_arr, format='PNG')
+    #     pil_image = PILImage.open(BytesIO(img_byte_arr.getvalue()))
+    #     text = extract_text_from_image(pil_image)
+    #     image_text.append(text)
     
     df = pd.read_excel(uploaded_file, sheet_name=0)
     df = df.fillna("")

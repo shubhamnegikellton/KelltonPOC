@@ -170,7 +170,7 @@ elif st.session_state.current_step == 2:
                     response = insert_data(connection, data_tuples)
                     if response.startswith("Error"):
                         error_placeholder.empty()
-                        error_placeholder.markdown(f"<div style='width: 100%; color: red;text-align:center;'>{response}</div>", unsafe_allow_html=True)
+                        error_placeholder.error(response)
                     else:
                         st.session_state.current_step = 3
                         st.rerun()

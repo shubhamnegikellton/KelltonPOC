@@ -23,8 +23,9 @@ if df is not None and not df.empty:
             response = drop_all_data(connection, "singtel_data")
             if response.startswith("Error"):
                 error_placeholder.empty()
-                error_placeholder.markdown(f"<div style='width: 100%; color: red;text-align:left;'>{response}</div>", unsafe_allow_html=True)
-            st.rerun()
+                error_placeholder.error(response)
+            else:
+                st.rerun()
 
     rows_per_page = 10
     total_rows = len(df)
@@ -57,4 +58,4 @@ if df is not None and not df.empty:
             unsafe_allow_html=True,
         )
 else:
-    st.warning("Please upload a file first on the Upload page.")
+    st.warning("No Data Found, Please upload a file first on the Upload page.")

@@ -458,33 +458,33 @@ def get_images_from_uploaded_file(uploaded_file):
     try:
         images = []
         file_contents = uploaded_file.read()
-        file_stream = BytesIO(file_contents)
-        file_name = uploaded_file.name
-        file_extension = file_name.split('.')[-1].lower()
 
-        if file_extension == 'xlsx':
-            wb = load_workbook(file_stream, data_only=True)
-            sheet_names = wb.sheetnames
+        # Use 'with' to ensure the stream remains open and is properly closed after use
+        with BytesIO(file_contents) as file_stream:
+            file_name = uploaded_file.name
+            file_extension = file_name.split('.')[-1].lower()
 
-            if not sheet_names:
-                print("No sheets found in the workbook.")
-                return []
+            if file_extension == 'xlsx':
+                wb = load_workbook(file_stream, data_only=True)
+                sheet_names = wb.sheetnames
 
-            first_sheet = wb[sheet_names[0]]
-            image_loader = SheetImageLoader(first_sheet)
+                if not sheet_names:
+                    print("No sheets found in the workbook.")
+                    return []
 
-            for row in first_sheet.iter_rows():
-                for cell in row:
-                    if image_loader.image_in(cell.coordinate):
-                        img = image_loader.get(cell.coordinate)
-                        images.append(img)
+                first_sheet = wb[sheet_names[0]]
+                image_loader = SheetImageLoader(first_sheet)
+
+                for row in first_sheet.iter_rows():
+                    for cell in row:
+                        if image_loader.image_in(cell.coordinate):
+                            img = image_loader.get(cell.coordinate)
+                            images.append(img)
 
         return images
     except Exception as e:
         print(f"Error: {e}")
         return []
-
-
 
 def extract_text_from_image(image):
     reader = easyocr.Reader(['en'])
